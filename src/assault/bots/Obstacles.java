@@ -8,6 +8,9 @@ package assault.bots;
 /**
  *
  * @author pavel.tretyakov
+ * 
+ * Главный класс, от которого плодятся все классы возможных предметов на поле
+ * 
  */
 public class Obstacles {
     
@@ -15,3 +18,4 @@ public class Obstacles {
     public int posY;
     
 }
+
