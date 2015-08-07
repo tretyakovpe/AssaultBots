@@ -12,14 +12,11 @@ import java.awt.Color;
  */
 
 
-public class Bot {
+public class Bot extends Obstacles{
 
     public String name;
 
     public int team;
-
-    public int posX;
-    public int posY;
 
     public int health;
     
@@ -98,20 +95,26 @@ public class Bot {
     }
     
     public void move(){
-         //размер одного хода. Зависит от скорости шасси
+        int surface = terrain.getSurface(this.posX, this.posY);
+        //размер одного хода. Зависит от скорости шасси
         float step = this.targetDistance/this.chassi.speed;
         //длины проекций вектора движения.
-        float vectorX=this.target.posX-this.posX;
-        float vectorY=this.target.posY-this.posY;
+        float vectorX=(this.target.posX-this.posX);
+        float vectorY=(this.target.posY-this.posY);
         
         //кол-во шагов по каждой оси
         float newX = this.posX+(vectorX/(step));
         float newY = this.posY+(vectorY/(step));
 
         //шагаем
-        
-        this.posX=(int)newX;
-        this.posY=(int)newY;
+        Object obstacle = terrain.getObstacle((int)newX, (int)newY);
+        if(obstacle==null)
+        {
+            terrain.setObstacle(posX, posY, null);
+            this.posX=(int)newX;
+            this.posY=(int)newY;
+            terrain.setObstacle(posX, posY, this);
+        }
         
         //System.out.println(this.name+" делает шаг в "+newX+"-"+newY);
         
@@ -160,13 +163,9 @@ public class Bot {
         this.botMode=1;
     }
     
-    
     public void die(){
         //System.out.println(this.name+" УМЕР");
     }
-    
-
-
     
     /**
      *Описывает цвета каждого из режимов работы бота

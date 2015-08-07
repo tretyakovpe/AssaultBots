@@ -20,6 +20,7 @@ public class Landscape {
         this.x=width;
         this.y=height;
         this.surface = new int[x][y];
+        this.obstacles= new Object[x][y];
     }
             
     public Object getObstacle(int x, int y) {
