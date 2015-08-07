@@ -14,64 +14,22 @@ import java.awt.Color;
 
 public class Bot {
 
-    /**
-     *название бота
-     */
     public String name;
 
-    /**
-     *идентификатор команды, пока не используется
-     */
     public int team;
 
-    /**
-     *положение на поле по горизонтали в клетках поля
-     */
     public int posX;
-
-    /**
-     *положение на поле по вертикали в клетках поля
-     */
     public int posY;
 
-    /**
-     *цвет флага команды
-     */
     public Color flagColor;
 
-    /**
-     *установленное шасси
-     */
     public Chassis chassi = new Chassis();
-
-    /**
-     *установленное оружие
-     */
     public Weapon weapon = new Weapon();
-
-    /**
-     *установленный источник питания
-     */
     public Power power = new Power();
-
-    /**
-     *установленный мозг
-     */
     public Comp comp = new Comp();
-    
-    /**
-     *текущая цель
-     */
+
     public Bot target;
-
-    /**
-     *расстояние до текущей цели
-     */
     public int targetDistance;
-
-    /**
-     *флаг живости/неживости
-     */
     public boolean isDead=false;
 
     /**
@@ -87,14 +45,6 @@ public class Bot {
      */
     public int botMode=1;
 
-    /**
-     * Создание бота
-     * @param name
-     * @param team
-     * @param X
-     * @param Y
-     * @param color 
-     */
     public void Bot(String name, int team, int X, int Y, Color color){
         this.name=name;
         this.team = team;
@@ -105,12 +55,6 @@ public class Bot {
         this.targetDistance=9999;
     }
     
-    /**
-     * Оценить дистанцию до объекта
-     * объект с минимальной дистанцией записать в цели
-     * 
-     * @param enemyBot цель, которую надо посмотреть
-     */
     public void see(Bot enemyBot){
         int X1 = enemyBot.posX;
         int Y1 = enemyBot.posY;
@@ -132,10 +76,23 @@ public class Bot {
             
         }
     }
+    public void aim(){
+        if (this.weapon.range>this.targetDistance)
+        {
+        //System.out.println(this.name+" прицелился в "+this.target.toString());
+            //Можно стрелять
+            this.botMode = 4;
+        }
+        else
+        {
+        //System.out.println(this.name+" видит, что до цели далеко ");
+        
+            //далеко, надо шагнуть ближе
+            this.botMode = 2;
+        }
+        
+    }
     
-    /**
-     * Перемещение в сторону цели
-     */
     public void move(){
          //размер одного хода. Зависит от скорости шасси
         float step = this.targetDistance/this.chassi.speed;
@@ -157,29 +114,7 @@ public class Bot {
         //посмотрим, может есть кто-нть поближе
         this.botMode=1;
     }
-    /**
-     * Оценка возможности ведения огня по цели
-     */
-    public void aim(){
-        if (this.weapon.range>this.targetDistance)
-        {
-        //System.out.println(this.name+" прицелился в "+this.target.toString());
-            //Можно стрелять
-            this.botMode = 4;
-        }
-        else
-        {
-        //System.out.println(this.name+" видит, что до цели далеко ");
-        
-            //далеко, надо шагнуть ближе
-            this.botMode = 2;
-        }
-        
-    }
 
-    /**
-     * Стреляем
-     */
     public void shoot(){
         
         //Это будут пули. пока не используется
@@ -211,9 +146,6 @@ public class Bot {
 
     }
     
-    /**
-     *
-     */
     public void die(){
         //System.out.println(this.name+" УМЕР");
     }
