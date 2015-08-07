@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package assault.bots;
 
 import java.awt.Color;
@@ -10,16 +5,11 @@ import java.awt.Color;
  *
  * @author pavel.tretyakov
  */
-
-
 public class Bot extends Obstacles{
 
     public String name;
-
     public int team;
-
     public int health;
-    
     public Color flagColor;
 
     public Chassis chassi = new Chassis();
@@ -27,6 +17,7 @@ public class Bot extends Obstacles{
     public Power power = new Power();
     public Comp comp = new Comp();
 
+    private Tower tower;
     public Landscape terrain;
     
     public Bot target;
@@ -162,9 +153,25 @@ public class Bot extends Obstacles{
         //после всех тестов, посмотрим вокруг.
         this.botMode=1;
     }
+
+    public void escape(){
+        //Panic-mode, срочно спасаться возле башни.
+        this.setTarget(tower);
+        
+        //если возле башни, посмотрим вокруг.
+        this.botMode=1;
+    }
     
     public void die(){
         //System.out.println(this.name+" УМЕР");
+    }
+    
+    public void setTarget(Object object){
+        
+    }
+    
+    public void setTower(Tower tower){
+        this.tower=tower;
     }
     
     /**
