@@ -10,22 +10,36 @@ package assault.bots;
  * @author pavel.tretyakov
  */
 public class Landscape {
+
     private int x;
     private int y;
     private int[][] surface;
+    private Object[][] obstacles;
 
-    public void setSize(int width, int height){
+    public Landscape(int width, int height){
         this.x=width;
         this.y=height;
         this.surface = new int[x][y];
     }
             
+    public Object getObstacle(int x, int y) {
+        return obstacles[x][y];
+    }
+
     public int getSurface(int x, int y) {
         return surface[x][y];
+    }
+    
+    public int[][] getWholeSurface(){
+        return this.surface;
     }
 
     public void setSurface(int x, int y, int surface) {
         this.surface[x][y] = surface;
+    }
+
+    public void setObstacle(int x, int y, Object obstacle) {
+        this.obstacles[x][y] = obstacle;
     }
     
 }

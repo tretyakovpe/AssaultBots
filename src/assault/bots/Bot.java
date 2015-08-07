@@ -21,6 +21,8 @@ public class Bot {
     public int posX;
     public int posY;
 
+    public int health;
+    
     public Color flagColor;
 
     public Chassis chassi = new Chassis();
@@ -28,9 +30,11 @@ public class Bot {
     public Power power = new Power();
     public Comp comp = new Comp();
 
+    public Landscape terrain;
+    
     public Bot target;
     public int targetDistance;
-    public boolean isDead=false;
+    
 
     /**
      *режим работы бота
@@ -40,17 +44,17 @@ public class Bot {
      * 2-движение к target
      * 3-прицеливание (оценка дистанции)
      * 4-стрельба
-     * 
-     * 
+     * 5-самотестирование
+     * 6-убегание
      */
-    public int botMode=1;
+    public int botMode;
 
     public void Bot(String name, int team, int X, int Y, Color color){
         this.name=name;
         this.team = team;
         this.posX=X; this.posY=Y;
         this.flagColor=color;
-        this.botMode=1;
+        this.botMode=5;
         this.target=null;
         this.targetDistance=9999;
     }
@@ -105,6 +109,7 @@ public class Bot {
         float newY = this.posY+(vectorY/(step));
 
         //шагаем
+        
         this.posX=(int)newX;
         this.posY=(int)newY;
         
@@ -146,108 +151,22 @@ public class Bot {
 
     }
     
+    public void selftest(){
+        
+        //нужно посчитать, сколько жизни у нас осталось
+        
+        
+        //после всех тестов, посмотрим вокруг.
+        this.botMode=1;
+    }
+    
+    
     public void die(){
         //System.out.println(this.name+" УМЕР");
     }
     
-    /**
-     *Шасси бота.
-     * @param durability запас прочности всего бота
-     * @param speed скорость перемещения
-     */
-    public class Chassis{
 
-        public String name;
-        public int speed;
-        public int durability;
-        public Color color;
-        public void truck(){
-                this.name = "Гусеницы";
-                this.durability = 20;
-                this.speed = 1;
-                this.color=Color.PINK;
-        }
-        public void wheel(){
-                this.name = "Колеса";
-                this.durability = 18;
-                this.speed = 2;
-                this.color=Color.black;
-        }
-        public void antigrav(){
-                this.name = "Антигравы";
-                this.durability = 15;
-                this.speed = 3;
-                this.color=Color.cyan;
-        }
-    }
 
-    public class Weapon{
-        public String name;
-        public int speed;
-        public int range;
-        public int damage;
-        public Color color;
-        public void cannon(){
-            this.name = "Пушка";
-            this.speed = 5;
-            this.range = 10;
-            this.damage = 3;
-            this.color=Color.green;
-        }
-        public void laser(){
-            this.name = "Лазер";
-            this.speed = 5;
-            this.range = 30;
-            this.damage = 1;
-            this.color=Color.PINK;
-        }
-        public void plasma(){
-            this.name = "Плазма";
-            this.speed = 1;
-            this.range = 15;
-            this.damage = 5;
-            this.color=Color.orange;
-        }
-    }
-
-    public class Power{
-        public String name;
-        public int power;
-        public int durability;
-
-        public void nuclearReactor() {
-            this.name = "Ядерный реактор";
-            this.power = 100;
-            this.durability = 10;
-        }
-        public void dieselEngine(){
-            this.name = "Дизель-генератор";
-            this.power = 10;
-            this.durability = 100;
-        }
-        public void tousandChinese(){
-            this.name = "Тысяча китайцев";
-            this.power = 50;
-            this.durability = 50;
-        }
-    }
-
-    public class Comp{
-        public String name;
-        public int viewDiastance;
-        public void deskComp(){
-            this.name="Десктоп";
-            this.viewDiastance=3;
-        }
-        public void militaryComp(){
-            this.name="Военный компьютер";
-            this.viewDiastance=5;
-        }
-        public void nasaComp(){
-            this.name="Спутниковое управление";
-            this.viewDiastance=15;
-        }
-    }
     
     /**
      *Описывает цвета каждого из режимов работы бота
