@@ -99,8 +99,8 @@ public abstract class Bot extends Obstacles{
     
     public void spawn(int index)
     {
-        int x = random.nextInt(WORLD_SIZE) + respawnX;
-        int y = random.nextInt(WORLD_SIZE) + respawnY;
+        int x = random.nextInt(WORLD_SIZE);
+        int y = random.nextInt(WORLD_SIZE);
         
         init(String.valueOf(index), 0, x, y);
         setEquipment(random.nextInt(3), random.nextInt(3));
@@ -158,7 +158,7 @@ public abstract class Bot extends Obstacles{
     
     public void move(){
         int surface = terrain.getSurface(this.posX, this.posY);
-        float step = this.targetDistance/this.body.speed;
+        float step = (float)this.targetDistance/(float)this.body.speed;
         float vectorX=(this.target.posX-this.posX);
         float vectorY=(this.target.posY-this.posY);
         //
