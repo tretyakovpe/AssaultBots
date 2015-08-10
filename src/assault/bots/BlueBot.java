@@ -3,7 +3,6 @@ package assault.bots;
 import assault.game.Score;
 import java.awt.Color;
 
-
 public class BlueBot extends Bot 
 {
     public BlueBot(Score score) 

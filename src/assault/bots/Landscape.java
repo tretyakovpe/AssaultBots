@@ -14,16 +14,16 @@ public class Landscape {
     private int x;
     private int y;
     private int[][] surface;
-    private Object[][] obstacles;
+    private Obstacles[][] obstacles;
 
     public Landscape(int width, int height){
         this.x=width;
         this.y=height;
         this.surface = new int[x][y];
-        this.obstacles= new Object[x][y];
+        this.obstacles= new Obstacles[x][y];
     }
             
-    public Object getObstacle(int x, int y) {
+    public Obstacles getObstacle(int x, int y) {
         return obstacles[x][y];
     }
 
@@ -39,7 +39,7 @@ public class Landscape {
         this.surface[x][y] = surface;
     }
 
-    public void setObstacle(int x, int y, Object obstacle) {
+    public void setObstacle(int x, int y, Obstacles obstacle) {
         this.obstacles[x][y] = obstacle;
     }
     

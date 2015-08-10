@@ -25,19 +25,19 @@ import java.awt.Color;
         public void truck(){
                 this.name = "Гусеницы";
                 this.durability = 20;
-                this.speed = 1;
+                this.speed = 3;
                 this.color=Color.PINK;
         }
         public void wheel(){
                 this.name = "Колеса";
                 this.durability = 18;
-                this.speed = 1;
+                this.speed = 6;
                 this.color=Color.black;
         }
         public void antigrav(){
                 this.name = "Антигравы";
                 this.durability = 15;
-                this.speed = 1;
+                this.speed = 9;
                 this.color=Color.cyan;
         }
     }

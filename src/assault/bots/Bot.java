@@ -25,6 +25,7 @@ public abstract class Bot extends Obstacles{
     public Comp comp = new Comp();
 
     private Tower tower;
+    private Obstacles obstacle;
     
     public Bot target;
     public int targetDistance;
@@ -66,7 +67,7 @@ public abstract class Bot extends Obstacles{
         this.flagColor = color;
         this.botMode = 1;
         this.target = null;
-        this.targetDistance = 9999;
+        this.targetDistance = 99999;
     }
 
 
@@ -141,7 +142,7 @@ public abstract class Bot extends Obstacles{
     public void aim(){
         if (this.weapon.range>this.targetDistance)
         {
-        System.out.println(this.name+" прицелился в "+this.target.toString());
+        System.out.println(this.name+" прицелился в "+this.target.name);
             //Можно стрелять
             this.botMode = 4;
         }
@@ -161,10 +162,10 @@ public abstract class Bot extends Obstacles{
         float vectorX=(this.target.posX-this.posX);
         float vectorY=(this.target.posY-this.posY);
         //
-        float newX = this.posX+(vectorX/step);
-        float newY = this.posY+(vectorY/step);
+        float newX = this.posX+(vectorX/step)/surface;
+        float newY = this.posY+(vectorY/step)/surface;
 
-        Object obstacle = terrain.getObstacle(Math.round(newX), Math.round(newY));
+        obstacle = terrain.getObstacle(Math.round(newX), Math.round(newY));
         if(obstacle==null)
         {
             terrain.setObstacle(posX, posY, null);
@@ -231,7 +232,7 @@ public abstract class Bot extends Obstacles{
     }
     
     public void die(){
-        //System.out.println(this.name+" УМЕР");
+        System.out.println(this.name+" УМЕР");
         terrain.setObstacle(posX, posY, null);
     }
     

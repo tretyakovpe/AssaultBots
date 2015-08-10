@@ -1,8 +1,8 @@
 package assault.bots;
 
 import java.awt.Color;
-import static assault.game.Constants.*;
 import assault.game.Score;
+import static assault.game.Constants.*;
 
 
 public class RedBot extends Bot 
