@@ -1,22 +1,22 @@
 package assault.game;
+import assault.bots.Bot;
 import assault.bots.BlueBot;
-import assault.bots.Bot;
 import assault.bots.RedBot;
-import assault.bots.Bot;
 import assault.bots.Landscape;
 import assault.bots.Tower;
+
+import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferStrategy;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 
 import static assault.game.Constants.*;
 
@@ -51,9 +51,7 @@ public class AssaultBots extends Canvas implements Runnable {
         public int respawnBlueX=1,respawnBlueY=1; //позиция для респа синих
         public int respawnRedX=WORLD_SIZE-2,respawnRedY=WORLD_SIZE-2; //позиция для респа красных
         
-        private int scoreBlue;
-        private int scoreRed;
-        
+        private Score score;
         
         private boolean leftPressed = false;
 	private boolean rightPressed = false;
@@ -89,13 +87,14 @@ public class AssaultBots extends Canvas implements Runnable {
 	public void init() {
 		addKeyListener(new KeyInputHandler());
                 landscapeInit();
+                Bot.terrain = land;                    
                 towerSetup();
                 for (int i=0; i<optionArmySize; i++)
                 {
                     armyBlue[i] = new BlueBot(score);
-                    spawn(i);
+                    armyBlue[i].spawn(i);
                     armyRed[i] = new RedBot(score);
-                    spawn(i);
+                    armyRed[i].spawn(i);
                 }
         }
 	
@@ -205,12 +204,12 @@ public class AssaultBots extends Canvas implements Runnable {
             g.setColor(armyBlue[0].flagColor);
             g.fillRect(10, 810, 100, 30);
             g.setColor(Color.yellow);
-            g.drawString(String.valueOf(scoreBlue), 20, 830);
+            //g.drawString(String.valueOf(score.getScoreBlue()), 20, 830);
             
             g.setColor(armyRed[0].flagColor);
             g.fillRect(120, 810, 100, 30);
             g.setColor(Color.yellow);
-            g.drawString(String.valueOf(scoreRed), 130, 830);
+            //g.drawString(String.valueOf(score.getScoreRed()), 130, 830);
             
         }
         
@@ -218,28 +217,8 @@ public class AssaultBots extends Canvas implements Runnable {
             
             for(int i=0; i<optionArmySize; i++)
             {
-                for(int j=0; j<optionArmySize; j++)
-                {
-                    switch (armyBlue[i].botMode)
-                    {
-                        case 0: armyBlue[i].die(); scoreRed++; spawnBlue(i);break;
-                        case 1: armyBlue[i].see(armyRed);break;
-                        case 2: armyBlue[i].aim();break;
-                        case 3: armyBlue[i].move();break;
-                        case 4: armyBlue[i].shoot();break;
-                        case 5: armyBlue[i].selftest();break;
-                    }
-
-                    switch (armyRed[i].botMode)
-                    {
-                        case 0: armyRed[i].die(); scoreBlue++; spawnRed(i);break;
-                        case 1: armyRed[i].see(armyBlue);break;
-                        case 2: armyRed[i].aim();break;
-                        case 3: armyRed[i].move();break;
-                        case 4: armyRed[i].shoot();break;
-                        case 5: armyRed[i].selftest();break;
-                    }
-                }
+                armyBlue[i].doAction(armyRed, i);
+                armyRed[i].doAction(armyBlue, i);
             }
             
             try {
@@ -248,7 +227,7 @@ public class AssaultBots extends Canvas implements Runnable {
                 Logger.getLogger(AssaultBots.class.getName()).log(Level.SEVERE, null, ex);
             }
 	}
-        public void spawnBlue(int i){
+/*        public void spawnBlue(int i){
             Random r = new Random();
             int posX = r.nextInt(optionArmySize)+respawnBlueX;
             int posY = r.nextInt(optionArmySize)+respawnBlueY;
@@ -297,7 +276,7 @@ public class AssaultBots extends Canvas implements Runnable {
                     armyRed[i].weapon.plasma();break;
             }
         }
-
+*/
         private void landscapeInit(){
             Random random = new Random();
             for(int y=0; y<WORLD_SIZE; y++)

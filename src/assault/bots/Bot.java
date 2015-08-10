@@ -1,10 +1,9 @@
 package assault.bots;
-import assault.game.Score;
 
 import java.awt.Color;
-import assault.bots.BlueBot;
-import assault.bots.Bot;
-import assault.bots.RedBot;
+import java.util.Random;
+import assault.game.Score;
+import static assault.game.Constants.*;
 
 
 /**
@@ -12,6 +11,8 @@ import assault.bots.RedBot;
  * @author pavel.tretyakov
  */
 public abstract class Bot extends Obstacles{
+
+    public static Landscape terrain;
 
     public String name;
     public int team;
@@ -24,10 +25,16 @@ public abstract class Bot extends Obstacles{
     public Comp comp = new Comp();
 
     private Tower tower;
-    public Landscape terrain;
     
     public Bot target;
     public int targetDistance;
+    
+    private Random random;
+    protected Score score;
+    
+    protected int respawnX = 1;
+    protected int respawnY = 1;
+
     
     /**
      *режим работы бота
@@ -42,17 +49,64 @@ public abstract class Bot extends Obstacles{
      */
     public int botMode;
 
-    public void Bot(String name, int team, int X, int Y, Color color){
-        this.name=name;
-        this.team = team;
-        this.posX=X; this.posY=Y;
-        this.flagColor=color;
-        this.botMode=1;
-        this.target=null;
-        this.targetDistance=9999;
-        System.out.println(this.name+" появился в "+posX+"-"+posY);
+    public Bot(Score score)
+    {
+        this.score=score;
+        random=new Random();
     }
     
+    public abstract void init(String name, int team, int X, int Y);
+
+    public void init(String name, int team, int X, int Y, Color color)
+    {
+        this.name = name;
+        this.team = team;
+        this.posX = X;
+        this.posY = Y;
+        this.flagColor = color;
+        this.botMode = 1;
+        this.target = null;
+        this.targetDistance = 9999;
+    }
+
+
+    public void doAction(Bot[] army, int botIndex)
+    {
+        switch (botMode)
+        {
+            case 0: 
+                die(); 
+                spawn(botIndex);
+                break;
+            case 1: 
+                see(army);
+                break;
+            case 2: 
+                aim();
+                break;
+            case 3: 
+                move();
+                break;
+            case 4: 
+                shoot();
+                break;
+            case 5: 
+                selftest();
+                break;
+        }
+    }
+    
+    public void spawn(int index)
+    {
+        int x = random.nextInt(WORLD_SIZE) + respawnX;
+        int y = random.nextInt(WORLD_SIZE) + respawnY;
+        
+        init(String.valueOf(index), 0, x, y);
+        setEquipment(random.nextInt(3), random.nextInt(3));
+        
+        
+    }
+
     public void see(Bot[] enemies){
         for (Bot enemyBot:enemies)
         {
@@ -165,13 +219,7 @@ public abstract class Bot extends Obstacles{
         
         this.health = this.body.durability;
         //нужно посчитать, сколько жизни у нас осталось
-        if(this.health<=3){
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return this.health > 3;
     }
 
     public void escape(){
@@ -195,6 +243,35 @@ public abstract class Bot extends Obstacles{
         this.tower=tower;
     }
     
+        public void setEquipment(int bodyId, int weaponId)
+    {
+        switch (bodyId)
+        {
+            case 0:
+                body.truck();
+                break;
+            case 1:
+                body.wheel();
+                break;
+            case 2:
+                body.antigrav();
+                break;
+        }
+
+        switch (weaponId)
+        {
+            case 0:
+                weapon.cannon();
+                break;
+            case 1:
+                weapon.laser();
+                break;
+            case 2:
+                weapon.plasma();
+                break;
+        }
+    }
+
     /**
      *Описывает цвета каждого из режимов работы бота
      * @return
