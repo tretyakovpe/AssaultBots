@@ -1,6 +1,10 @@
-import assault.bots.Obstacles;
+package assault.game;
+import assault.bots.BlueBot;
+import assault.bots.Bot;
+import assault.bots.RedBot;
 import assault.bots.Bot;
 import assault.bots.Landscape;
+import assault.bots.Tower;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -13,6 +17,9 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+
+import static assault.game.Constants.*;
+
 /**
  * 
  * @author pavel.tretyakov
@@ -31,23 +38,18 @@ public class AssaultBots extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 	
 	private boolean running;
-	
-	public final static int windowWidth = 800;
-	public final static int windowHeight = 850;
-	public static String NAME = "Assault Bots";
-	
-        
-        public int cellSize=12; //размер ячейки игрового поля
-        public int worldSize=windowWidth/cellSize; //размер игрового поля в ячейках
-        public int optionArmySize = 5; //кол-во ботов в команде
-        
+
+        public int optionArmySize = 2; //кол-во ботов в команде	
+
         public Bot[] armyBlue = new Bot[optionArmySize];
         public Bot[] armyRed = new Bot[optionArmySize];
         
-        public Landscape land = new Landscape(worldSize,worldSize);
+        public Landscape land = new Landscape(WORLD_SIZE,WORLD_SIZE);
+        
+        public Tower tower;
         
         public int respawnBlueX=1,respawnBlueY=1; //позиция для респа синих
-        public int respawnRedX=worldSize-2,respawnRedY=worldSize-2; //позиция для респа красных
+        public int respawnRedX=WORLD_SIZE-2,respawnRedY=WORLD_SIZE-2; //позиция для респа красных
         
         private int scoreBlue;
         private int scoreRed;
@@ -55,6 +57,9 @@ public class AssaultBots extends Canvas implements Runnable {
         
         private boolean leftPressed = false;
 	private boolean rightPressed = false;
+
+    public AssaultBots() {
+    }
 	
 	public void start() {
 		running = true;
@@ -73,18 +78,24 @@ public class AssaultBots extends Canvas implements Runnable {
 			lastTime = System.currentTimeMillis();	
 			update(delta);
 			render();
+                        
+                        //running=false;
+                        
+                        
+                        
 		}
 	}
 	
 	public void init() {
 		addKeyListener(new KeyInputHandler());
                 landscapeInit();
+                towerSetup();
                 for (int i=0; i<optionArmySize; i++)
                 {
-                    armyBlue[i] = new Bot();
-                    spawnBlue(i);
-                    armyRed[i] = new Bot();
-                    spawnRed(i);
+                    armyBlue[i] = new BlueBot(score);
+                    spawn(i);
+                    armyRed[i] = new RedBot(score);
+                    spawn(i);
                 }
         }
 	
@@ -97,32 +108,51 @@ public class AssaultBots extends Canvas implements Runnable {
 		}
 		Graphics g = bs.getDrawGraphics(); 
                 drawLandscape(g);
+                drawTower(g);
                     
                 for(int i=0; i<optionArmySize; i++)
                 {
                     drawBot(g, armyBlue[i]);
                     drawBot(g,armyRed[i]);
+                    drawShoot(g, armyBlue[i]);
+                    drawShoot(g,armyRed[i]);
                 }
                 drawHud(g);
                 g.dispose();
                 bs.show();
                 }
 
+        private void drawTower(Graphics g){
+            g.setColor(Color.yellow);
+            g.fillOval(tower.posX*CELL_SIZE, tower.posY*CELL_SIZE,CELL_SIZE,CELL_SIZE);
+            g.setColor(Color.red);
+            g.drawOval(tower.posX*CELL_SIZE+2, tower.posY*CELL_SIZE+2,CELL_SIZE-4,CELL_SIZE-4);
+        }
+
         private void drawLandscape(Graphics g){
-            for(int y=0; y<worldSize; y++)
+            for(int y=0; y<WORLD_SIZE; y++)
             {
-                for(int x=0; x<worldSize; x++)
+                for(int x=0; x<WORLD_SIZE; x++)
                 {
                     int surface = land.getSurface(x, y);
+                    Object obstacle = land.getObstacle(x, y);
                     int[][] Surface = land.getWholeSurface();
+                    
+                    
                     float hue,saturation,brightness;
                     hue = 0.4f;
                     saturation = 0.5f;
-                    brightness = (float) Surface[x][y]*0.1f;
+                    brightness = (float) surface*0.025f+0.1f;
                     
                     Color C = Color.getHSBColor(hue,saturation,brightness);
                     g.setColor(C);
-                    g.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
+                    g.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+                    if (obstacle!=null)
+                    {
+                        g.setColor(Color.BLACK);
+                        g.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
                 }
             }
         }
@@ -131,30 +161,33 @@ public class AssaultBots extends Canvas implements Runnable {
         {
             //Дальность оружия
 /*            g.setColor(bot.weapon.color);
-            g.drawOval((bot.posX*cellSize)-(bot.weapon.range*cellSize)/2, (bot.posY*cellSize)-(bot.weapon.range*cellSize)/2, bot.weapon.range*cellSize, bot.weapon.range*cellSize);
+            g.drawOval((bot.posX*CELL_SIZE)-(bot.weapon.range*CELL_SIZE)/2, (bot.posY*CELL_SIZE)-(bot.weapon.range*CELL_SIZE)/2, bot.weapon.range*CELL_SIZE, bot.weapon.range*CELL_SIZE);
 */      //Цвет команды
             g.setColor(bot.flagColor);
-            g.fillRoundRect(bot.posX*cellSize, bot.posY*cellSize, cellSize, cellSize,5,5);
+            g.fillRoundRect(bot.posX*CELL_SIZE, bot.posY*CELL_SIZE, CELL_SIZE, CELL_SIZE,5,5);
             g.setColor(Color.white);
-            g.drawRoundRect(bot.posX*cellSize, bot.posY*cellSize, cellSize, cellSize,5,5);
+            g.drawRoundRect(bot.posX*CELL_SIZE, bot.posY*CELL_SIZE, CELL_SIZE, CELL_SIZE,5,5);
         //Статус
             g.setColor(bot.getStatusColor());
-            g.fillOval(bot.posX*cellSize+5, bot.posY*cellSize+5,9,9);
+            g.fillOval(bot.posX*CELL_SIZE+5, bot.posY*CELL_SIZE+5,9,9);
             g.setColor(Color.white);
-            g.drawOval(bot.posX*cellSize+5, bot.posY*cellSize+5,9,9);
-
+            g.drawOval(bot.posX*CELL_SIZE+5, bot.posY*CELL_SIZE+5,9,9);
+        }
+        
+        private void drawShoot(Graphics g, Bot bot){
         //Стрельба
             if(bot.botMode==4)
             {
                 g.setColor(bot.flagColor);
-                g.drawLine(bot.posX*cellSize+5, bot.posY*cellSize+5, bot.target.posX*cellSize+5, bot.target.posY*cellSize+5);
+                g.drawLine(bot.posX*CELL_SIZE+5, bot.posY*CELL_SIZE+5, bot.target.posX*CELL_SIZE+5, bot.target.posY*CELL_SIZE+5);
+                g.fillOval(bot.target.posX*CELL_SIZE+5, bot.target.posY*CELL_SIZE+5,20,20);
             }
             
 /*            //Целеуказатель
             g.setColor(bot.flagColor);
             if (bot.target!=null)
             {
-                g.drawLine(bot.posX*cellSize, bot.posY*cellSize, bot.target.posX*cellSize, bot.target.posY*cellSize);
+                g.drawLine(bot.posX*CELL_SIZE, bot.posY*CELL_SIZE, bot.target.posX*CELL_SIZE, bot.target.posY*CELL_SIZE);
             }
 */            
         }
@@ -190,9 +223,9 @@ public class AssaultBots extends Canvas implements Runnable {
                     switch (armyBlue[i].botMode)
                     {
                         case 0: armyBlue[i].die(); scoreRed++; spawnBlue(i);break;
-                        case 1: armyBlue[i].see(armyRed[j]);break;
-                        case 2: armyBlue[i].move();break;
-                        case 3: armyBlue[i].aim();break;
+                        case 1: armyBlue[i].see(armyRed);break;
+                        case 2: armyBlue[i].aim();break;
+                        case 3: armyBlue[i].move();break;
                         case 4: armyBlue[i].shoot();break;
                         case 5: armyBlue[i].selftest();break;
                     }
@@ -200,9 +233,9 @@ public class AssaultBots extends Canvas implements Runnable {
                     switch (armyRed[i].botMode)
                     {
                         case 0: armyRed[i].die(); scoreBlue++; spawnRed(i);break;
-                        case 1: armyRed[i].see(armyBlue[j]);break;
-                        case 2: armyRed[i].move();break;
-                        case 3: armyRed[i].aim();break;
+                        case 1: armyRed[i].see(armyBlue);break;
+                        case 2: armyRed[i].aim();break;
+                        case 3: armyRed[i].move();break;
                         case 4: armyRed[i].shoot();break;
                         case 5: armyRed[i].selftest();break;
                     }
@@ -221,13 +254,14 @@ public class AssaultBots extends Canvas implements Runnable {
             int posY = r.nextInt(optionArmySize)+respawnBlueY;
             armyBlue[i].Bot("B-"+i, 0, posX, posY, Color.blue);
             armyBlue[i].terrain = land;
+            land.setObstacle(posX, posY, armyBlue[i]);
             switch (r.nextInt(3)){
                 case 0:
-                    armyBlue[i].chassi.truck();break;
+                    armyBlue[i].body.truck();break;
                 case 1:
-                    armyBlue[i].chassi.wheel();break;
+                    armyBlue[i].body.wheel();break;
                 case 2:
-                    armyBlue[i].chassi.antigrav();break;
+                    armyBlue[i].body.antigrav();break;
             }
             switch (r.nextInt(3)){
                 case 0:
@@ -245,13 +279,14 @@ public class AssaultBots extends Canvas implements Runnable {
             int posY = respawnRedY-r.nextInt(optionArmySize);
             armyRed[i].Bot("R-"+i, 1, posX, posY, Color.red);
             armyRed[i].terrain=land;
+            land.setObstacle(posX, posY, armyRed[i]);
             switch (r.nextInt(3)){
                 case 0:
-                    armyRed[i].chassi.truck();break;
+                    armyRed[i].body.truck();break;
                 case 1:
-                    armyRed[i].chassi.wheel();break;
+                    armyRed[i].body.wheel();break;
                 case 2:
-                    armyRed[i].chassi.antigrav();break;
+                    armyRed[i].body.antigrav();break;
             }
             switch (r.nextInt(3)){
                 case 0:
@@ -265,9 +300,9 @@ public class AssaultBots extends Canvas implements Runnable {
 
         private void landscapeInit(){
             Random random = new Random();
-            for(int y=0; y<worldSize; y++)
+            for(int y=0; y<WORLD_SIZE; y++)
             {
-                for(int x=0; x<worldSize; x++)
+                for(int x=0; x<WORLD_SIZE; x++)
                 {
                     int r=random.nextInt(5)+1;
                     land.setSurface(x, y, r);
@@ -275,10 +310,18 @@ public class AssaultBots extends Canvas implements Runnable {
             }
         }
         
+        private void towerSetup(){
+            Random r = new Random();
+            int posX = r.nextInt(WORLD_SIZE);
+            int posY = r.nextInt(WORLD_SIZE);
+            tower = new Tower(posX, posY);
+            land.setObstacle(posX, posY, tower);
+        }
+        
 	public static void main(String[] args) {
 		AssaultBots game = new AssaultBots();
-		game.setPreferredSize(new Dimension(windowWidth, windowHeight));
-		JFrame frame = new JFrame(AssaultBots.NAME);
+		game.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+		JFrame frame = new JFrame(NAME);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		frame.add(game, BorderLayout.CENTER);

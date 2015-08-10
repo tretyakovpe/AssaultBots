@@ -12,7 +12,7 @@ package assault.bots;
  * Главный класс, от которого плодятся все классы возможных предметов на поле
  * 
  */
-public class Obstacles {
+public abstract class Obstacles {
     
     public int posX;
     public int posY;

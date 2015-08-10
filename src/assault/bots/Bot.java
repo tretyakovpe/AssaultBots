@@ -1,18 +1,24 @@
 package assault.bots;
+import assault.game.Score;
 
 import java.awt.Color;
+import assault.bots.BlueBot;
+import assault.bots.Bot;
+import assault.bots.RedBot;
+
+
 /**
  *
  * @author pavel.tretyakov
  */
-public class Bot extends Obstacles{
+public abstract class Bot extends Obstacles{
 
     public String name;
     public int team;
     public int health;
     public Color flagColor;
 
-    public Chassis chassi = new Chassis();
+    public Chassis body = new Chassis();
     public Weapon weapon = new Weapon();
     public Power power = new Power();
     public Comp comp = new Comp();
@@ -23,14 +29,13 @@ public class Bot extends Obstacles{
     public Bot target;
     public int targetDistance;
     
-
     /**
      *режим работы бота
      * 
      * 0-мертв
      * 1-поиск цели
-     * 2-движение к target
-     * 3-прицеливание (оценка дистанции)
+     * 2-прицеливание (оценка дистанции)
+     * 3-движение к target
      * 4-стрельба
      * 5-самотестирование
      * 6-убегание
@@ -42,72 +47,83 @@ public class Bot extends Obstacles{
         this.team = team;
         this.posX=X; this.posY=Y;
         this.flagColor=color;
-        this.botMode=5;
+        this.botMode=1;
         this.target=null;
         this.targetDistance=9999;
+        System.out.println(this.name+" появился в "+posX+"-"+posY);
     }
     
-    public void see(Bot enemyBot){
-        int X1 = enemyBot.posX;
-        int Y1 = enemyBot.posY;
-        int X = this.posX;
-        int Y = this.posY;
-        
-        //System.out.println(this.name+" видит "+enemyBot.toString()+" в "+X1+"-"+Y1);
-        
-        //Вычисляем дистанцию до бота, если она меньше предыдущей, выбираем его в качестве цели.
-        double distance=Math.sqrt(Math.pow((X1-X),2)+Math.pow((Y1-Y),2));
-        if((int)distance <= this.targetDistance)
+    public void see(Bot[] enemies){
+        for (Bot enemyBot:enemies)
         {
-            this.target=enemyBot;
-            this.targetDistance = (int) distance;
-            //посмотрим, может можно стрельнуть
-            this.botMode=3;
-            
-            //System.out.println(this.name+" выбрал целью "+enemyBot.toString());
-            
+            int X1 = enemyBot.posX;
+            int Y1 = enemyBot.posY;
+            int X = this.posX;
+            int Y = this.posY;
+
+            System.out.println(this.name+" видит "+enemyBot.name);
+
+            //Вычисляем дистанцию до бота, если она меньше предыдущей, выбираем его в качестве цели.
+            double distance=Math.sqrt(Math.pow((X1-X),2)+Math.pow((Y1-Y),2));
+            if((int)distance <= this.targetDistance)
+            {
+                this.target=enemyBot;
+                this.targetDistance = (int) distance;
+                //посмотрим, может можно стрельнуть
+                this.botMode=2;
+
+                System.out.println(this.name+" выбрал целью "+enemyBot.name+" в "+X1+"-"+Y1);
+
+            }
+        }
+        if(selftest()!=true){
+            this.botMode=6;
+            System.out.println(this.name+" оценил своё состояние как плохое");
+        } else {
+            System.out.println(this.name+" чувствует себя хорошо");
         }
     }
+
     public void aim(){
         if (this.weapon.range>this.targetDistance)
         {
-        //System.out.println(this.name+" прицелился в "+this.target.toString());
+        System.out.println(this.name+" прицелился в "+this.target.toString());
             //Можно стрелять
             this.botMode = 4;
         }
         else
         {
-        //System.out.println(this.name+" видит, что до цели далеко ");
+        System.out.println(this.name+" видит, что до цели "+this.targetDistance);
         
             //далеко, надо шагнуть ближе
-            this.botMode = 2;
+            this.botMode = 3;
         }
         
     }
     
     public void move(){
         int surface = terrain.getSurface(this.posX, this.posY);
-        //размер одного хода. Зависит от скорости шасси
-        float step = this.targetDistance/this.chassi.speed;
-        //длины проекций вектора движения.
+        float step = this.targetDistance/this.body.speed;
         float vectorX=(this.target.posX-this.posX);
         float vectorY=(this.target.posY-this.posY);
-        
-        //кол-во шагов по каждой оси
-        float newX = this.posX+(vectorX/(step));
-        float newY = this.posY+(vectorY/(step));
+        //
+        float newX = this.posX+(vectorX/step);
+        float newY = this.posY+(vectorY/step);
 
-        //шагаем
-        Object obstacle = terrain.getObstacle((int)newX, (int)newY);
+        Object obstacle = terrain.getObstacle(Math.round(newX), Math.round(newY));
         if(obstacle==null)
         {
             terrain.setObstacle(posX, posY, null);
-            this.posX=(int)newX;
-            this.posY=(int)newY;
+            this.posX=Math.round(newX);
+            this.posY=Math.round(newY);
             terrain.setObstacle(posX, posY, this);
+            System.out.println(this.name+" делает шаг в "+Math.round(newX)+"-"+Math.round(newY));
+        }
+        else
+        {
+            System.out.println(this.name+" не может сходить в "+Math.round(newX)+"-"+Math.round(newY));
         }
         
-        //System.out.println(this.name+" делает шаг в "+newX+"-"+newY);
         
         this.targetDistance=99999;
         //посмотрим, может есть кто-нть поближе
@@ -123,7 +139,7 @@ public class Bot extends Obstacles{
         //System.out.println(this.name+" стреляет.");
         
         //оружие стреляет и попадает со 100% вероятностью
-        int resultOfFiring = this.target.chassi.durability-this.weapon.damage;
+        int resultOfFiring = this.target.body.durability-this.weapon.damage;
         if(resultOfFiring<=0)
         {
             
@@ -137,7 +153,7 @@ public class Bot extends Obstacles{
 
         //System.out.println(this.name+" ранил "+this.target.toString());
 
-            this.target.chassi.durability-=this.weapon.damage;
+            this.target.body.durability-=this.weapon.damage;
         }
         //после стрельбы надо оглядеться вокруг, может кто-то ближе подошел
         this.targetDistance=99999;
@@ -145,13 +161,17 @@ public class Bot extends Obstacles{
 
     }
     
-    public void selftest(){
+    public boolean selftest(){
         
+        this.health = this.body.durability;
         //нужно посчитать, сколько жизни у нас осталось
-        
-        
-        //после всех тестов, посмотрим вокруг.
-        this.botMode=1;
+        if(this.health<=3){
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public void escape(){
@@ -164,6 +184,7 @@ public class Bot extends Obstacles{
     
     public void die(){
         //System.out.println(this.name+" УМЕР");
+        terrain.setObstacle(posX, posY, null);
     }
     
     public void setTarget(Object object){
@@ -185,8 +206,8 @@ public class Bot extends Obstacles{
         switch(this.botMode){
             case 0: C=Color.black;break;
             case 1: C=Color.white;break;
-            case 2: C=Color.green;break;
-            case 3: C=Color.yellow;break;
+            case 2: C=Color.yellow;break;
+            case 3: C=Color.green;break;
             case 4: C=Color.red;break;
             case 5: C=Color.magenta;break;
         }
