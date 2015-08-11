@@ -4,12 +4,13 @@ package assault.game;
 public class Score
 {
 
+    private int scoreBlue;
+    private int scoreRed;
+
     public Score() {
         this.scoreBlue = 0;
         this.scoreRed = 0;
     }
-    private int scoreBlue;
-    private int scoreRed;
 
     public int getScoreBlue()
     {

@@ -57,6 +57,8 @@ public class AssaultBots extends Canvas implements Runnable {
 	private boolean rightPressed = false;
 
     public AssaultBots() {
+        setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        score = new Score();
     }
 	
 	public void start() {
