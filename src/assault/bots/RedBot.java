@@ -21,7 +21,7 @@ public class RedBot extends Bot
     public void init(String name, int team, int X, int Y)
     {
         super.init("R-" + name, team, X, Y, flagColor);
-        System.out.println("R-" + name+" появился в "+X+"-"+Y);
+//        System.out.println("R-" + name+" появился в "+X+"-"+Y);
     }
     
     @Override

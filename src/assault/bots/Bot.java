@@ -1,5 +1,10 @@
 package assault.bots;
 
+import assault.equipment.Comp;
+import assault.equipment.Power;
+import assault.equipment.Weapon;
+import assault.equipment.Body;
+import assault.equipment.Equipment;
 import java.awt.Color;
 import java.util.Random;
 import assault.game.Score;
@@ -16,10 +21,9 @@ public abstract class Bot extends Obstacles{
 
     public String name;
     public int team;
-    public int health;
     public Color flagColor;
 
-    public Chassis body = new Chassis();
+    public Body body = new Body();
     public Weapon weapon = new Weapon();
     public Power power = new Power();
     public Comp comp = new Comp();
@@ -27,7 +31,7 @@ public abstract class Bot extends Obstacles{
     private Tower tower;
     private Obstacles obstacle;
     
-    public Bot target;
+    public Obstacles target;
     public int targetDistance;
     
     private Random random;
@@ -45,8 +49,7 @@ public abstract class Bot extends Obstacles{
      * 2-прицеливание (оценка дистанции)
      * 3-движение к target
      * 4-стрельба
-     * 5-самотестирование
-     * 6-убегание
+     * 5-убегание
      */
     public int botMode;
 
@@ -73,10 +76,10 @@ public abstract class Bot extends Obstacles{
 
     public void doAction(Bot[] army, int botIndex)
     {
+        selfTest();
         switch (botMode)
         {
             case 0: 
-                die(); 
                 spawn(botIndex);
                 break;
             case 1: 
@@ -92,7 +95,7 @@ public abstract class Bot extends Obstacles{
                 shoot();
                 break;
             case 5: 
-                selftest();
+                escape();
                 break;
         }
     }
@@ -103,21 +106,31 @@ public abstract class Bot extends Obstacles{
         int y = random.nextInt(WORLD_SIZE);
         
         init(String.valueOf(index), 0, x, y);
-        setEquipment(random.nextInt(3), random.nextInt(3));
-        
-        
+        setEquipment(random.nextInt(3), random.nextInt(3), random.nextInt(3));
+        this.health=body.durability+power.durability;
+    }
+
+    public void selfTest(){
+        if(health<=0)
+        {
+            die();
+            botMode=0;
+        }
+        else if (health <=3)
+        {
+            botMode=5;
+        }
     }
 
     public void see(Bot[] enemies){
+        
         for (Bot enemyBot:enemies)
         {
             int X1 = enemyBot.posX;
             int Y1 = enemyBot.posY;
             int X = this.posX;
             int Y = this.posY;
-
-            System.out.println(this.name+" видит "+enemyBot.name);
-
+//            System.out.println(this.name+" видит "+enemyBot.name);
             //Вычисляем дистанцию до бота, если она меньше предыдущей, выбираем его в качестве цели.
             double distance=Math.sqrt(Math.pow((X1-X),2)+Math.pow((Y1-Y),2));
             if((int)distance <= this.targetDistance)
@@ -126,34 +139,24 @@ public abstract class Bot extends Obstacles{
                 this.targetDistance = (int) distance;
                 //посмотрим, может можно стрельнуть
                 this.botMode=2;
-
-                System.out.println(this.name+" выбрал целью "+enemyBot.name+" в "+X1+"-"+Y1);
-
+//                System.out.println(this.name+" выбрал целью "+enemyBot.name+" в "+X1+"-"+Y1);
             }
-        }
-        if(selftest()!=true){
-            this.botMode=6;
-            System.out.println(this.name+" оценил своё состояние как плохое");
-        } else {
-            System.out.println(this.name+" чувствует себя хорошо");
         }
     }
 
     public void aim(){
         if (this.weapon.range>this.targetDistance)
         {
-        System.out.println(this.name+" прицелился в "+this.target.name);
+//        System.out.println(this.name+" прицелился в "+this.target.name);
             //Можно стрелять
             this.botMode = 4;
         }
         else
         {
-        System.out.println(this.name+" видит, что до цели "+this.targetDistance);
-        
+//        System.out.println(this.name+" видит, что до цели "+this.targetDistance);
             //далеко, надо шагнуть ближе
             this.botMode = 3;
         }
-        
     }
     
     public void move(){
@@ -164,7 +167,7 @@ public abstract class Bot extends Obstacles{
         //
         float newX = this.posX+(vectorX/step)/surface;
         float newY = this.posY+(vectorY/step)/surface;
-
+        
         obstacle = terrain.getObstacle(Math.round(newX), Math.round(newY));
         if(obstacle==null)
         {
@@ -172,12 +175,13 @@ public abstract class Bot extends Obstacles{
             this.posX=Math.round(newX);
             this.posY=Math.round(newY);
             terrain.setObstacle(posX, posY, this);
-            System.out.println(this.name+" делает шаг в "+Math.round(newX)+"-"+Math.round(newY));
+//            System.out.println(this.name+" делает шаг в "+Math.round(newX)+"-"+Math.round(newY));
         }
-        else
+        else 
         {
-            System.out.println(this.name+" не может сходить в "+Math.round(newX)+"-"+Math.round(newY));
+            searchObstacle(Math.round(newX), Math.round(newY));
         }
+        
         
         
         this.targetDistance=99999;
@@ -192,37 +196,12 @@ public abstract class Bot extends Obstacles{
         //projectile = new Projectile(this.posX, this.posY, this.target.posX, this.target.posY, this.weapon.speed, this.weapon.damage);
         
         //System.out.println(this.name+" стреляет.");
-        
-        //оружие стреляет и попадает со 100% вероятностью
-        int resultOfFiring = this.target.body.durability-this.weapon.damage;
-        if(resultOfFiring<=0)
-        {
-            
-        //System.out.println(this.name+" убил "+this.target.toString());
-
-            this.target.botMode=0;
-            this.targetDistance=99999;
-        }
-        else
-        {
-
-        //System.out.println(this.name+" ранил "+this.target.toString());
-
-            this.target.body.durability-=this.weapon.damage;
-        }
-        //после стрельбы надо оглядеться вокруг, может кто-то ближе подошел
+        this.target.doDamage(this.weapon.damage);
         this.targetDistance=99999;
         this.botMode=1;
 
     }
     
-    public boolean selftest(){
-        
-        this.health = this.body.durability;
-        //нужно посчитать, сколько жизни у нас осталось
-        return this.health > 3;
-    }
-
     public void escape(){
         //Panic-mode, срочно спасаться возле башни.
         this.setTarget(tower);
@@ -232,19 +211,40 @@ public abstract class Bot extends Obstacles{
     }
     
     public void die(){
-        System.out.println(this.name+" УМЕР");
-        terrain.setObstacle(posX, posY, null);
+//        System.out.println(this.name+" УМЕР");
+        switch(random.nextInt(2)){
+            case 0:
+                terrain.setBotRemains(posX, posY, this.body);
+                System.out.println("Остатки: "+this.body.name);
+                break;
+            case 1:
+                terrain.setBotRemains(posX, posY, this.power);
+                System.out.println("Остатки: "+this.power.name);
+                break;
+        }
     }
     
-    public void setTarget(Object object){
-        
+    public void setTarget(Obstacles object){
+        this.target=object;
     }
     
     public void setTower(Tower tower){
         this.tower=tower;
     }
     
-        public void setEquipment(int bodyId, int weaponId)
+    public void searchObstacle(int x, int y){
+        obstacle = terrain.getObstacle(x, y);
+        if (obstacle instanceof assault.bots.BotRemains)
+        {
+            BotRemains remains = (BotRemains) obstacle;
+            Equipment part = remains.getPart();
+            this.health+=part.durability;
+            System.out.println(this.name+" подобрал "+part.name);
+            terrain.setObstacle(x, y, null);
+        }
+    }
+    
+        public void setEquipment(int bodyId, int weaponId, int powerId)
     {
         switch (bodyId)
         {
@@ -269,6 +269,18 @@ public abstract class Bot extends Obstacles{
                 break;
             case 2:
                 weapon.plasma();
+                break;
+        }
+        switch (powerId)
+        {
+            case 0:
+                power.dieselEngine();
+                break;
+            case 1:
+                power.nuclearReactor();
+                break;
+            case 2:
+                power.tousandChinese();
                 break;
         }
     }

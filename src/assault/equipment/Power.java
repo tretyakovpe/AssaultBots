@@ -3,16 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package assault.bots;
+package assault.equipment;
 
 /**
  *
  * @author pavel.tretyakov
  */
-    public class Power{
+    public class Power extends Equipment{
         public String name;
         public int power;
-        public int durability;
 
         public void nuclearReactor() {
             this.name = "Ядерный реактор";

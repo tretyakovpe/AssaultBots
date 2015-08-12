@@ -15,7 +15,7 @@ public class BlueBot extends Bot
     public void init(String name, int team, int X, int Y)
     {
         super.init("B-" + name, team, X, Y, flagColor);
-        System.out.println("B-" + name+" появился в "+X+"-"+Y);
+//        System.out.println("B-" + name+" появился в "+X+"-"+Y);
         
     }
     

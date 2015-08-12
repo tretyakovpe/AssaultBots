@@ -5,6 +5,8 @@
  */
 package assault.bots;
 
+import assault.equipment.*;
+
 /**
  *
  * @author pavel.tretyakov
@@ -42,5 +44,14 @@ public class Landscape {
     public void setObstacle(int x, int y, Obstacles obstacle) {
         this.obstacle[x][y] = obstacle;
     }
-    
+
+    public void setBotRemains(int x, int y, Equipment part) {
+        BotRemains botRemains = new BotRemains();
+        botRemains.setPart(part);
+        
+        System.out.println("Остатки в "+x+"-"+y+" "+botRemains.getPart().name);
+        
+        this.obstacle[x][y] = botRemains;
+    }
+   
 }

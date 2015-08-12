@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package assault.bots;
+package assault.equipment;
 
 import java.awt.Color;
 
@@ -16,11 +16,10 @@ import java.awt.Color;
      * @param durability запас прочности всего бота
      * @param speed скорость перемещения
      */
-    public class Chassis{
+    public class Body extends Equipment{
 
         public String name;
         public int speed;
-        public int durability;
         public Color color;
         public void truck(){
                 this.name = "Гусеницы";

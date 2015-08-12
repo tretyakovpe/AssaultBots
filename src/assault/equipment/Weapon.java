@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package assault.bots;
+package assault.equipment;
 
 import java.awt.Color;
 
@@ -11,7 +11,7 @@ import java.awt.Color;
  *
  * @author pavel.tretyakov
  */
-    public class Weapon{
+    public class Weapon extends Equipment{
         public String name;
         public int speed;
         public int range;
@@ -27,7 +27,7 @@ import java.awt.Color;
         public void laser(){
             this.name = "Лазер";
             this.speed = 5;
-            this.range = 5;
+            this.range = 7;
             this.damage = 1;
             this.color=Color.PINK;
         }

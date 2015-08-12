@@ -16,6 +16,13 @@ public abstract class Obstacles {
     
     public int posX;
     public int posY;
+    public int health;
+    
+    public void doDamage(int damage)
+    {
+        this.health-=damage;
+    }
+    
     
 }
 
