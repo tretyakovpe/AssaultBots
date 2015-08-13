@@ -14,7 +14,6 @@ public class BotRemains extends Obstacles{
     public Equipment part;
 
     public BotRemains(Equipment part) {
-        System.out.println("Остатки пришли: "+part);
         this.part=part;
     }
 

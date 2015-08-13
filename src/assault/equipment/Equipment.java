@@ -5,6 +5,8 @@
  */
 package assault.equipment;
 
+import java.awt.image.BufferedImage;
+
 /**
  *
  * @author pavel.tretyakov
@@ -12,4 +14,5 @@ package assault.equipment;
 public abstract class Equipment {
     public String name;
     public int durability;
+    public BufferedImage image;
 }

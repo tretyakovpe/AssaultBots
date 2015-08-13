@@ -143,11 +143,6 @@ public class AssaultBots extends Canvas implements Runnable {
                         g.fillOval(x*CELL_SIZE+5, y*CELL_SIZE+5,9,9);
                         g.setColor(Color.white);
                         g.drawOval(x*CELL_SIZE+5, y*CELL_SIZE+5,9,9);
-                        
-//                        BotRemains br = (BotRemains)obstacle;
-//                        String obstacleName = br.getPart().name;
-//                        g.setColor(Color.white);
-//                        g.drawString(obstacleName, x*CELL_SIZE, y*CELL_SIZE);
                     }
                 }
             }
@@ -155,10 +150,13 @@ public class AssaultBots extends Canvas implements Runnable {
         
 	private void drawBot(Graphics g, Bot bot)
         {
-            //Дальность оружия
+            g.drawImage(bot.body.image, bot.posX*CELL_SIZE, bot.posY*CELL_SIZE, this);
+            g.drawImage(bot.power.image, bot.posX*CELL_SIZE, bot.posY*CELL_SIZE, this);
+            
+        //Дальность оружия
 /*            g.setColor(bot.weapon.color);
             g.drawOval((bot.posX*CELL_SIZE)-(bot.weapon.range*CELL_SIZE)/2, (bot.posY*CELL_SIZE)-(bot.weapon.range*CELL_SIZE)/2, bot.weapon.range*CELL_SIZE, bot.weapon.range*CELL_SIZE);
-*/      //Цвет команды
+      //Цвет команды
             g.setColor(bot.flagColor);
             g.fillRoundRect(bot.posX*CELL_SIZE, bot.posY*CELL_SIZE, CELL_SIZE, CELL_SIZE,5,5);
             g.setColor(Color.white);
@@ -171,7 +169,7 @@ public class AssaultBots extends Canvas implements Runnable {
             g.fillOval(bot.posX*CELL_SIZE+5, bot.posY*CELL_SIZE+5,9,9);
             g.setColor(Color.white);
             g.drawOval(bot.posX*CELL_SIZE+5, bot.posY*CELL_SIZE+5,9,9);
-        }
+*/        }
         
         private void drawShoot(Graphics g, Bot bot){
         //Стрельба

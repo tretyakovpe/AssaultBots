@@ -231,8 +231,6 @@ public abstract class Bot extends Obstacles{
             default:
                 remains=null;
         }
-        System.out.println("Остатки Были: "+this.body);
-        System.out.println("Остатки Передались: "+remains.getPart());
         terrain.setObstacle(posX, posY, remains);
     }
     

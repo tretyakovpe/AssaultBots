@@ -10,5 +10,5 @@ public final class Constants
     
     public static final int CELL_SIZE = 20; //размер ячейки игрового поля
     //размер игрового поля в ячейках
-    public static final int WORLD_SIZE = WINDOW_HEIGHT / CELL_SIZE;
+    public static final int WORLD_SIZE = WINDOW_WIDTH / CELL_SIZE;
 }
