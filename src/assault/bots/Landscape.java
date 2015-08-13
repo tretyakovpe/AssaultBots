@@ -46,11 +46,7 @@ public class Landscape {
     }
 
     public void setBotRemains(int x, int y, Equipment part) {
-        BotRemains botRemains = new BotRemains();
-        botRemains.setPart(part);
-        
-        System.out.println("Остатки в "+x+"-"+y+" "+botRemains.getPart().name);
-        
+        BotRemains botRemains = new BotRemains(part);
         this.obstacle[x][y] = botRemains;
     }
    

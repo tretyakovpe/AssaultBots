@@ -212,16 +212,19 @@ public abstract class Bot extends Obstacles{
     
     public void die(){
 //        System.out.println(this.name+" УМЕР");
+        BotRemains part;
         switch(random.nextInt(2)){
             case 0:
-                terrain.setBotRemains(posX, posY, this.body);
-                System.out.println("Остатки: "+this.body.name);
+                part = new BotRemains(this.body);
                 break;
             case 1:
-                terrain.setBotRemains(posX, posY, this.power);
-                System.out.println("Остатки: "+this.power.name);
+                part = new BotRemains(this.power);
                 break;
+            default:
+                part=null;
         }
+        System.out.println("Остатки: "+part.getPart().name);
+        terrain.setObstacle(posX, posY, part);
     }
     
     public void setTarget(Obstacles object){

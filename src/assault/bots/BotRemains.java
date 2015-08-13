@@ -13,11 +13,9 @@ public class BotRemains extends Obstacles{
     
     private Equipment part;
 
-    public BotRemains() {
-    }
-
-    public void setPart(Equipment part) {
-        this.part = part;
+    public BotRemains(Equipment part) {
+        System.out.println(part.name);
+        this.part=part;
     }
 
     public Equipment getPart() {
