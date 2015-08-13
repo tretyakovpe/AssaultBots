@@ -11,10 +11,10 @@ import assault.equipment.*;
  */
 public class BotRemains extends Obstacles{
     
-    private Equipment part;
+    public Equipment part;
 
     public BotRemains(Equipment part) {
-        System.out.println(part.name);
+        System.out.println("Остатки пришли: "+part);
         this.part=part;
     }
 

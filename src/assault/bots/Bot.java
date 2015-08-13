@@ -210,21 +210,30 @@ public abstract class Bot extends Obstacles{
         this.botMode=1;
     }
     
+    public void lookForSpareParts(){
+        
+    }
+    
     public void die(){
 //        System.out.println(this.name+" УМЕР");
-        BotRemains part;
+        BotRemains remains;
         switch(random.nextInt(2)){
             case 0:
-                part = new BotRemains(this.body);
+                remains = new BotRemains(this.body);
+                remains.health = this.body.durability;
+                remains.part.name = this.body.name;
                 break;
             case 1:
-                part = new BotRemains(this.power);
+                remains = new BotRemains(this.power);
+                remains.health = this.power.durability;
+                remains.part.name = this.power.name;
                 break;
             default:
-                part=null;
+                remains=null;
         }
-        System.out.println("Остатки: "+part.getPart().name);
-        terrain.setObstacle(posX, posY, part);
+        System.out.println("Остатки Были: "+this.body);
+        System.out.println("Остатки Передались: "+remains.getPart());
+        terrain.setObstacle(posX, posY, remains);
     }
     
     public void setTarget(Obstacles object){
@@ -242,7 +251,7 @@ public abstract class Bot extends Obstacles{
             BotRemains remains = (BotRemains) obstacle;
             Equipment part = remains.getPart();
             this.health+=part.durability;
-            System.out.println(this.name+" подобрал "+part.name);
+            System.out.println(this.name+" подобрал "+part.name+" добавил "+part.durability+" здоровья");
             terrain.setObstacle(x, y, null);
         }
     }
