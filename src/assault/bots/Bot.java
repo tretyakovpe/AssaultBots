@@ -168,6 +168,11 @@ public abstract class Bot extends Obstacles{
         float newX = this.posX+(vectorX/step)/surface;
         float newY = this.posY+(vectorY/step)/surface;
         
+        newX = newX<0?0:newX;
+        newY = newY<0?0:newY;
+        newX = newX>WORLD_SIZE?WORLD_SIZE:newX;
+        newY = newY>WORLD_SIZE?WORLD_SIZE:newY;
+        
         obstacle = terrain.getObstacle(Math.round(newX), Math.round(newY));
         if(obstacle==null)
         {
@@ -222,11 +227,13 @@ public abstract class Bot extends Obstacles{
                 remains = new BotRemains(this.body);
                 remains.health = this.body.durability;
                 remains.part.name = this.body.name;
+                remains.part.image = this.body.image;
                 break;
             case 1:
                 remains = new BotRemains(this.power);
                 remains.health = this.power.durability;
                 remains.part.name = this.power.name;
+                remains.part.image = this.power.image;
                 break;
             default:
                 remains=null;
@@ -249,6 +256,16 @@ public abstract class Bot extends Obstacles{
             BotRemains remains = (BotRemains) obstacle;
             Equipment part = remains.getPart();
             this.health+=part.durability;
+            if(part instanceof Body)
+            {
+                this.body = (Body) part;
+            }
+            
+            if(part instanceof Power)
+            {
+                this.power = (Power) part;
+            }
+            
             System.out.println(this.name+" подобрал "+part.name+" добавил "+part.durability+" здоровья");
             terrain.setObstacle(x, y, null);
         }
