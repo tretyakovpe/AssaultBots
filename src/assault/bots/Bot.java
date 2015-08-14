@@ -259,11 +259,13 @@ public abstract class Bot extends Obstacles{
             if(part instanceof Body)
             {
                 this.body = (Body) part;
+                this.body.image = part.image;
             }
             
             if(part instanceof Power)
             {
                 this.power = (Power) part;
+                this.power.image = part.image;
             }
             
             System.out.println(this.name+" подобрал "+part.name+" добавил "+part.durability+" здоровья");
