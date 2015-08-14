@@ -1,6 +1,5 @@
 package assault.game;
 import assault.bots.*;
-import assault.equipment.Equipment;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,38 +9,24 @@ import java.awt.image.BufferStrategy;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * 
- * @author pavel.tretyakov
- * 
- * Правила: две команды ботов. Каждый бот состоит из шасси, оружия, источника энергии,
- * и мозгов. 
- * Реализовано: шасси, оружие.
- * Каждый бот в процессе игры волен выбирать себе цель и решать, двигаться к ней, стрелять в неё,
- * убегать от неё, ждать в засаде и т.д.
- * Реализовано: находим ближайшего противника и бежим к нему, по пути смотрим более близкие цели
- * при достижении дистанции выстрела - стреляем, что есть мочи.
- * 
- * 
- */
 public class AssaultBots extends Canvas implements Runnable {
-	private static final long serialVersionUID = 1L;
-	
-	private boolean running;
+    private static final long serialVersionUID = 1L;
 
-        public int optionArmySize = 3; //кол-во ботов в команде	
+    private boolean running;
 
-        public Bot[] armyBlue = new Bot[optionArmySize];
-        public Bot[] armyRed = new Bot[optionArmySize];
-        
-        public Landscape land = new Landscape(WORLD_SIZE,WORLD_SIZE);
-        
-        public Tower tower;
-        
-        public int respawnBlueX=1,respawnBlueY=1; //позиция для респа синих
-        public int respawnRedX=WORLD_SIZE-2,respawnRedY=WORLD_SIZE-2; //позиция для респа красных
-        
-        private Score score;
+    public int optionArmySize = 3; //кол-во ботов в команде	
+
+    public Bot[] armyBlue = new Bot[optionArmySize];
+    public Bot[] armyRed = new Bot[optionArmySize];
+
+    public Landscape land = new Landscape(WORLD_SIZE,WORLD_SIZE);
+
+    public Tower tower;
+
+    public int respawnBlueX=1,respawnBlueY=1; //позиция для респа синих
+    public int respawnRedX=WORLD_SIZE-2,respawnRedY=WORLD_SIZE-2; //позиция для респа красных
+
+    private Score score;
         
     public AssaultBots() {
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -55,21 +40,13 @@ public class AssaultBots extends Canvas implements Runnable {
 	
         @Override
 	public void run() {
-		long lastTime = System.currentTimeMillis();
 		long delta;
 		init();
-		
-		
 		while(running) {
-			delta = 250L; //System.currentTimeMillis() - lastTime;
-			lastTime = System.currentTimeMillis();	
+			delta = 250L;
 			update(delta);
 			render();
-                        
                         //running=false;
-                        
-                        
-                        
 		}
 	}
 	
@@ -89,7 +66,7 @@ public class AssaultBots extends Canvas implements Runnable {
 	public void render() {
             BufferStrategy bs = getBufferStrategy();
             if (bs == null) {
-                    createBufferStrategy(3);
+                    createBufferStrategy(2);
                     requestFocus();
                     return;
             }
@@ -126,7 +103,7 @@ public class AssaultBots extends Canvas implements Runnable {
                     float hue,saturation,brightness;
                     hue = 0.4f;
                     saturation = 0.5f;
-                    brightness = (float) surface*0.025f+0.1f;
+                    brightness = (float) surface*0.025f+0.5f;
                     
                     Color C = Color.getHSBColor(hue,saturation,brightness);
                     g.setColor(C);
